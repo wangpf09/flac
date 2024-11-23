@@ -1,0 +1,18 @@
+flac:
+  baseurl: https://api.flac.life
+  search-api: search/qq
+  url-qq: url/qq
+  unlock-code: 5767
+  quality:
+    - "flac"
+    - "320"
+    - "128"
+  keywords:
+    - 邓紫棋
+    - 郁可唯
+    - 周杰伦
+    - 朴树
+    - 许巍
+  page-size: 30
+
+worker-count: 5

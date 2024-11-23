@@ -53,3 +53,19 @@ func sanitizeFileName(name string) string {
 	}
 	return name
 }
+
+// RemoveEmptyDir 判断文件夹是否为空，并删除它（如果为空）
+func RemoveEmptyDir(dirPath string) error {
+	entries, err := os.ReadDir(dirPath)
+	if err != nil {
+		return fmt.Errorf("error reading directory %s: %w", dirPath, err)
+	}
+	if len(entries) == 0 {
+		err = os.Remove(dirPath)
+		if err != nil {
+			return fmt.Errorf("error removing empty directory %s: %w", dirPath, err)
+		}
+		fmt.Printf("Removed empty directory: %s\n", dirPath)
+	}
+	return nil
+}
