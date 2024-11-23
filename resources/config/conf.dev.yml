@@ -16,3 +16,4 @@ flac:
   page-size: 30
 
 worker-count: 5
+save-path: music

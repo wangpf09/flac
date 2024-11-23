@@ -3,6 +3,7 @@ package config
 type Config struct {
 	FlacInfo    FlacInfo `yaml:"flac"`
 	WorkerCount int      `yaml:"worker-count"`
+	SavePath    string   `yaml:"save-path"`
 }
 
 type FlacInfo struct {

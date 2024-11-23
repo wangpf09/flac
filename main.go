@@ -14,7 +14,7 @@ func main() {
 	flacInfo := config.GetAppConfig().FlacInfo
 	page := 1
 	i := 0
-	baseDir := "Music"
+	baseDir := config.GetAppConfig().SavePath
 
 	for {
 		// 从第一个接口获取音乐信息
