@@ -4,6 +4,7 @@ import (
 	"flac/config"
 	"flac/model"
 	"flac/util"
+	"flag"
 	"fmt"
 	"sync"
 	"time"
@@ -11,6 +12,18 @@ import (
 
 func main() {
 	config.InitConfig()
+	m := flag.Int("m", 0, "model: 0 fetch music; 1 clean data;")
+	flag.Parse()
+
+	switch *m {
+	case 0:
+		fetchAllMusic()
+	case 1:
+		cleanDirtyData()
+	}
+}
+
+func fetchAllMusic() {
 	flacInfo := config.GetAppConfig().FlacInfo
 	page := 1
 	i := 0
@@ -45,7 +58,7 @@ func main() {
 				// 遍历每首歌曲并启动协程处理
 				for s := range taskChan {
 					fmt.Printf("Processing song: %s\n", s.Name)
-					if err := util.ProcessSong(s, baseDir, flacInfo.UnlockCode); err != nil {
+					if err := util.ProcessSong(flacInfo.Keywords[i], s, baseDir, flacInfo.UnlockCode); err != nil {
 						time.Sleep(15 * time.Second)
 						fmt.Printf("Error processing song '%s': %v\n", s.Name, err)
 					} else {
@@ -70,4 +83,16 @@ func main() {
 		time.Sleep(5 * time.Second)
 	}
 	fmt.Println("All songs processed.")
+}
+
+func cleanDirtyData() {
+	baseDir := config.GetAppConfig().SavePath
+	for i := 0; i < 3; i++ {
+		fmt.Printf("clean base dir: %s\n", baseDir)
+		err := util.CleanupMusicFiles(baseDir, util.IgnoreKeywords)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	fmt.Println("All dirty data cleaned.")
 }

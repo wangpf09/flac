@@ -2,7 +2,7 @@ flac:
   baseurl: https://api.flac.life
   search-api: search/qq
   url-qq: url/qq
-  unlock-code: 5767
+  unlock-code: 4F73
   quality:
     - "flac"
     - "320"

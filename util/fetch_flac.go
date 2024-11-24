@@ -15,7 +15,7 @@ import (
 )
 
 // ProcessSong 处理单首歌曲的下载和保存
-func ProcessSong(song model.Song, baseDir string, unlockCode string) error {
+func ProcessSong(currentSinger string, song model.Song, baseDir string, unlockCode string) error {
 	// 组合保存路径
 	artist := sanitizeFileName(strings.Join(song.Singers, " & "))
 	album := sanitizeFileName(song.AlbumName)
@@ -51,6 +51,50 @@ func ProcessSong(song model.Song, baseDir string, unlockCode string) error {
 			fmt.Printf("Error removing empty directory %s: %v\n", baseDir, err)
 		}
 		return fmt.Errorf("error downloading song file: %w", err)
+	}
+
+	meta, err := getMusicFileMeta(musicFilePath)
+	if err != nil {
+		err := os.Remove(musicFilePath)
+		if err != nil {
+			return fmt.Errorf("error deleting file %s: %w", musicFilePath, err)
+		}
+		return fmt.Errorf("error getting music file metadata: %w", err)
+	}
+
+	errorInfo := make(map[string]string)
+	force := false
+	if meta.Album() != song.AlbumName {
+		errorInfo["album_name"] = meta.Album()
+	}
+
+	if meta.Title() != song.Name {
+		errorInfo["title"] = meta.Title()
+	}
+
+	if !containsKeywords(meta.Artist(), song.Singers) {
+		errorInfo["artist"] = meta.Artist()
+	}
+
+	if !strings.Contains(meta.Artist(), currentSinger) {
+		errorInfo["cartist"] = meta.Artist()
+		force = true
+	}
+
+	if containsKeywords(musicFilePath, IgnoreKeywords) {
+		errorInfo["keywords"] = musicFilePath
+		force = true
+	}
+
+	if len(errorInfo) > 3 || force {
+		err := os.Remove(musicFilePath)
+		if err != nil {
+			return fmt.Errorf("error deleting file %s: %w", musicFilePath, err)
+		}
+		for k, v := range errorInfo {
+			fmt.Printf("deleting meta not match file %s %s: %s\n", musicFilePath, k, v)
+		}
+		fmt.Printf("album %s name %s singers %s\n", song.AlbumName, song.Name, song.Singers)
 	}
 
 	// 下载封面图片
